@@ -1,4 +1,5 @@
 import type { CellValue, GameStatus } from "~/hooks/useTicTacToe";
+import { PlayerIcon } from "./Icons";
 
 type BoardProps = {
   board: CellValue[];
@@ -18,13 +19,45 @@ type CellProps = {
   onPlay: (index: number) => void;
 };
 
+function VisIcon({
+  value,
+  className,
+}: {
+  value: CellValue;
+  className?: string;
+}) {
+  if (value === null) {
+    // Subtle dot for empty state, but aria-label on button provides context.
+    return <span aria-hidden="true" className={className}>•</span>;
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className={className}
+    >
+      <PlayerIcon
+        player={value}
+        // We use emoji fallback for visual crispness and simplicity.
+        fallbackEmoji
+        // Color is inherited from parent span via Tailwind classes.
+      />
+    </span>
+  );
+}
+
 function Cell({ value, index, disabled, highlight, onPlay }: CellProps) {
   const isEmpty = value === null;
+  const isX = value === "X";
+  const colorClass = isX
+    ? "text-blue-600"
+    : value === "O"
+      ? "text-amber-500"
+      : "text-gray-300";
 
   return (
     <button
       type="button"
-      aria-label={`Cell ${index + 1}${value ? ` with ${value}` : ""}`}
+      aria-label={`Cell ${index + 1}${value ? ` with ${value === "X" ? "Knight" : "Queen"}` : ""}`}
       aria-disabled={disabled || !isEmpty}
       onClick={() => onPlay(index)}
       onKeyDown={(e) => {
@@ -48,17 +81,15 @@ function Cell({ value, index, disabled, highlight, onPlay }: CellProps) {
         aspectRatio: "1 / 1",
       }}
     >
-      <span
+      <VisIcon
+        value={value}
         className={classNames(
           "text-4xl sm:text-5xl md:text-6xl font-extrabold select-none",
-          value === "X" ? "text-blue-600" : value === "O" ? "text-amber-500" : "text-transparent",
+          colorClass,
           "transition-transform duration-150 ease-out",
           value ? "scale-100" : "scale-95 group-active:scale-90"
         )}
-        aria-hidden="true"
-      >
-        {value ?? "•"}
-      </span>
+      />
     </button>
   );
 }

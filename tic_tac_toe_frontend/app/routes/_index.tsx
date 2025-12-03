@@ -2,6 +2,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useMemo, useRef } from "react";
 import { Board } from "~/components/Board";
 import { useTicTacToe } from "~/hooks/useTicTacToe";
+import { PlayerIcon } from "~/components/Icons";
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,9 +22,9 @@ export default function Index() {
   // Accessibility: Announce status updates
   const liveRef = useRef<HTMLDivElement | null>(null);
   const statusMessage = useMemo(() => {
-    if (status.type === "win") return `Player ${status.winner} wins!`;
+    if (status.type === "win") return `Player ${status.winner === "X" ? "Knight" : "Queen"} wins!`;
     if (status.type === "draw") return "It's a draw.";
-    return `Current player: ${currentPlayer}`;
+    return `Current player: ${currentPlayer === "X" ? "Knight" : "Queen"}`;
   }, [status, currentPlayer]);
 
   useEffect(() => {
@@ -69,12 +70,29 @@ export default function Index() {
                     }
                     aria-live="polite"
                   >
-                    {currentPlayer}
+                    <span className="inline-flex items-center gap-1">
+                      <PlayerIcon
+                        player={currentPlayer}
+                        fallbackEmoji
+                        title={currentPlayer === "X" ? "Knight (Player X)" : "Queen (Player O)"}
+                      />
+                      <span className="sr-only">
+                        {currentPlayer === "X" ? "Knight (Player X)" : "Queen (Player O)"}
+                      </span>
+                    </span>
                   </span>
                 </span>
                 {!canPlay && status.type === "win" && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-200">
-                    Winner: {status.winner}
+                    <span className="sr-only">Winner:</span>
+                    <PlayerIcon
+                      player={status.winner}
+                      fallbackEmoji
+                      title={status.winner === "X" ? "Knight (Winner)" : "Queen (Winner)"}
+                    />
+                    <span aria-hidden="true" className="ml-1">
+                      {status.winner === "X" ? "Knight" : "Queen"}
+                    </span>
                   </span>
                 )}
                 {!canPlay && status.type === "draw" && (
@@ -86,11 +104,15 @@ export default function Index() {
 
               {/* Scores */}
               <div className="flex items-center gap-2 text-sm">
-                <span className="rounded-md bg-blue-50 px-2.5 py-1 font-semibold text-blue-700 ring-1 ring-blue-200">
-                  X: {scores.X}
+                <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 font-semibold text-blue-700 ring-1 ring-blue-200">
+                  <PlayerIcon player="X" fallbackEmoji title="Knight (Player X)" />
+                  <span aria-hidden="true">:</span>
+                  <span aria-label="Knight score">{scores.X}</span>
                 </span>
-                <span className="rounded-md bg-amber-50 px-2.5 py-1 font-semibold text-amber-700 ring-1 ring-amber-200">
-                  O: {scores.O}
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2.5 py-1 font-semibold text-amber-700 ring-1 ring-amber-200">
+                  <PlayerIcon player="O" fallbackEmoji title="Queen (Player O)" />
+                  <span aria-hidden="true">:</span>
+                  <span aria-label="Queen score">{scores.O}</span>
                 </span>
                 <span className="rounded-md bg-gray-100 px-2.5 py-1 font-semibold text-gray-700 ring-1 ring-gray-300">
                   Draws: {scores.draws}
