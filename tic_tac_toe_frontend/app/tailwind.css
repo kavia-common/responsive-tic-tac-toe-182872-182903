@@ -2,11 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #2563EB;
+  --color-secondary: #F59E0B;
+  --color-success: #F59E0B;
+  --color-error: #EF4444;
+  --color-background: #f9fafb;
+  --color-surface: #ffffff;
+  --color-text: #111827;
+}
+
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-[var(--color-background)];
+  color: var(--color-text);
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }
